@@ -28,6 +28,30 @@ fn part_1(input: &str) -> u16 {
         .sum()
 }
 
+fn part_2(input: &str) -> usize {
+    let priorities = get_priority_map();
+    let mut rucksacks = input
+        .split('\n')
+        .filter(|line| !line.is_empty())
+        .map(|line| line.chars().unique().collect::<Vec<_>>());
+
+    let mut priorities_sum = 0;
+    while let Some((elf_1, elf_2, elf_3)) =
+        rucksacks.next_tuple::<(Vec<char>, Vec<char>, Vec<char>)>()
+    {
+        if let Some(shared_item) = elf_1
+            .iter()
+            .find(|item| elf_2.contains(item) && elf_3.contains(item))
+        {
+            if let Some(priority) = priorities.get(shared_item) {
+                priorities_sum += priority;
+            }
+        }
+    }
+
+    priorities_sum
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -36,6 +60,9 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 3 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 3 Part 2: {}", part_2_result);
 }
 
 #[cfg(test)]
@@ -47,5 +74,12 @@ mod tests {
         let test_input = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw\n\n";
 
         assert_eq!(part_1(test_input), 157);
+    }
+
+    #[test]
+    fn part_2_should_find_duplicated_letters_in_each_line_and_summarize_their_priorities() {
+        let test_input = "vJrwpWtwJgWrhcsFMMfFFhFp\njqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\nPmmdzqPrVvPwwTWBwg\nwMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\nttgJtRGJQctTZtZT\nCrZsJsPPZsGzwwsLwLmpwMDw\n\n";
+
+        assert_eq!(part_2(test_input), 70);
     }
 }
