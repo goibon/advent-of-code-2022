@@ -9,6 +9,12 @@ enum Hand {
     Scissors,
 }
 
+enum Outcome {
+    Win,
+    Lose,
+    Draw,
+}
+
 const WIN_VALUE: u16 = 6;
 const LOSE_VALUE: u16 = 0;
 const DRAW_VALUE: u16 = 3;
@@ -59,6 +65,72 @@ fn part_1(input: &str) -> u16 {
         .sum()
 }
 
+fn map_input_for_part_2(string: &str) -> Vec<(Hand, Outcome)> {
+    string
+        .split('\n')
+        .filter(|line| !line.is_empty())
+        .filter_map(|line| {
+            let hands = line
+                .chars()
+                .filter(|&character| character != ' ')
+                .collect::<Vec<_>>();
+            if let [hand, outcome] = hands[..] {
+                let hand = match hand {
+                    'A' => Some(Hand::Rock),
+                    'B' => Some(Hand::Paper),
+                    'C' => Some(Hand::Scissors),
+                    _ => None,
+                };
+                let outcome = match outcome {
+                    'X' => Some(Outcome::Lose),
+                    'Y' => Some(Outcome::Draw),
+                    'Z' => Some(Outcome::Win),
+                    _ => None,
+                };
+
+                match (hand, outcome) {
+                    (Some(hand), Some(outcome)) => Some((hand, outcome)),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        })
+        .collect::<_>()
+}
+
+fn part_2(input: &str) -> u16 {
+    map_input_for_part_2(input)
+        .iter()
+        .map(|(hand, outcome)| match outcome {
+            Outcome::Win => {
+                WIN_VALUE
+                    + match hand {
+                        Hand::Rock => PAPER_VALUE,
+                        Hand::Paper => SCISSORS_VALUE,
+                        Hand::Scissors => ROCK_VALUE,
+                    }
+            }
+            Outcome::Lose => {
+                LOSE_VALUE
+                    + match hand {
+                        Hand::Rock => SCISSORS_VALUE,
+                        Hand::Paper => ROCK_VALUE,
+                        Hand::Scissors => PAPER_VALUE,
+                    }
+            }
+            Outcome::Draw => {
+                DRAW_VALUE
+                    + match hand {
+                        Hand::Rock => ROCK_VALUE,
+                        Hand::Paper => PAPER_VALUE,
+                        Hand::Scissors => SCISSORS_VALUE,
+                    }
+            }
+        })
+        .sum()
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -67,6 +139,9 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 2 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 2 Part 2: {}", part_2_result);
 }
 
 #[cfg(test)]
@@ -100,5 +175,12 @@ mod tests {
         let test_input = "A Y\nB X\nC Z\n\n";
 
         assert_eq!(part_1(test_input), 15);
+    }
+
+    #[test]
+    fn part_2_should_return_the_score_from_following_the_strategy() {
+        let test_input = "A Y\nB X\nC Z\n\n";
+
+        assert_eq!(part_2(test_input), 12);
     }
 }
