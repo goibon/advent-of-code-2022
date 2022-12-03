@@ -1,14 +1,18 @@
 use itertools::Itertools;
 use std::collections::HashMap;
 
-fn part_1(input: &str) -> u16 {
+fn get_priority_map() -> HashMap<char, usize> {
     let mut priorities: HashMap<char, usize> = HashMap::new();
     let mut letters = ('a'..='z').collect::<Vec<_>>();
     letters.extend('A'..='Z');
     for (priority, character) in letters.iter().enumerate() {
         priorities.insert(*character, priority + 1);
     }
+    priorities
+}
 
+fn part_1(input: &str) -> u16 {
+    let priorities = get_priority_map();
     input
         .split('\n')
         .filter(|line| !line.is_empty())
