@@ -73,6 +73,32 @@ fn part_1(input: &str) -> String {
     }
 }
 
+fn part_2(input: &str) -> String {
+    if let Some((initial_stacks, instructions)) = input.split_once("\n\n") {
+        let stack_count = get_stack_count(initial_stacks);
+        let stack_lines = initial_stacks
+            .lines()
+            .flat_map(parse_stack_line)
+            .collect::<Vec<_>>();
+        let mut stack_map = stack_lines_to_map(stack_lines, stack_count);
+        instructions.lines().map(parse_instruction_line).for_each(
+            |[move_count, from_stack, to_stack]| {
+                let stack_length = stack_map[from_stack - 1].len();
+                let mut element_to_append = stack_map[from_stack - 1]
+                    .drain(stack_length - move_count..)
+                    .collect();
+                stack_map[to_stack - 1].append(&mut element_to_append);
+            },
+        );
+        stack_map
+            .iter()
+            .filter_map(|stack| stack.last())
+            .collect::<String>()
+    } else {
+        panic!()
+    }
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -81,6 +107,9 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 5 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 5 Part 2: {}", part_2_result);
 }
 
 #[cfg(test)]
