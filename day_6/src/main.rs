@@ -1,19 +1,22 @@
 use std::collections::HashSet;
 
-fn part_1(input: &str) -> usize {
-    let characters = input.chars().collect::<Vec<_>>();
-    characters
-        .windows(4)
+fn find_index_of_first_set_of_unique_chars(iter: &[char], set_size: usize) -> usize {
+    iter.windows(set_size)
         .enumerate()
         .find_map(|(index, window)| {
             let mut unique = HashSet::new();
             if window.iter().all(|value| unique.insert(value)) {
-                Some(index + 4)
+                Some(index + set_size)
             } else {
                 None
             }
         })
         .unwrap()
+}
+
+fn part_1(input: &str) -> usize {
+    let characters = input.chars().collect::<Vec<_>>();
+    find_index_of_first_set_of_unique_chars(&characters, 4)
 }
 
 fn main() {
