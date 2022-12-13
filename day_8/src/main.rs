@@ -65,6 +65,24 @@ fn search_until_edge_or_blocked(
     (distance, hit_edge)
 }
 
+fn search_in_all_directions_until_edge_or_blocked(
+    start_y: usize,
+    start_x: usize,
+    map: &HashMap<(usize, usize), u32>,
+    limit: usize,
+) -> (i32, i32, i32, i32) {
+    let (distance_left, _) =
+        search_until_edge_or_blocked(start_y, start_x, map, Direction::Left, limit);
+    let (distance_right, _) =
+        search_until_edge_or_blocked(start_y, start_x, map, Direction::Right, limit);
+    let (distance_up, _) =
+        search_until_edge_or_blocked(start_y, start_x, map, Direction::Up, limit);
+    let (distance_down, _) =
+        search_until_edge_or_blocked(start_y, start_x, map, Direction::Down, limit);
+
+    (distance_left, distance_right, distance_up, distance_down)
+}
+
 fn part_1(input: &str) -> usize {
     let map: HashMap<(usize, usize), u32> = create_map(input);
     let mut visible_trees = Vec::<(usize, usize)>::new();
@@ -98,6 +116,18 @@ fn part_1(input: &str) -> usize {
     visible_trees.len()
 }
 
+fn part_2(input: &str) -> usize {
+    let map: HashMap<(usize, usize), u32> = create_map(input);
+    let upper_limit = ((map.len() as f32).sqrt() - 1.) as usize;
+    let mut scenic_scores = map
+        .keys()
+        .map(|(y, x)| search_in_all_directions_until_edge_or_blocked(*y, *x, &map, upper_limit))
+        .map(|(a, b, c, d)| a * b * c * d)
+        .collect::<Vec<_>>();
+    scenic_scores.sort_unstable();
+    *scenic_scores.last().unwrap() as usize
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -106,6 +136,9 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 8 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 8 Part 2: {}", part_2_result);
 }
 
 #[cfg(test)]
@@ -117,5 +150,12 @@ mod tests {
         let input = "30373\n25512\n65332\n33549\n35390\n\n";
 
         assert_eq!(part_1(input), 21)
+    }
+
+    #[test]
+    fn part_2_should_return_the_highest_scenic_score() {
+        let input = "30373\n25512\n65332\n33549\n35390\n\n";
+
+        assert_eq!(part_2(input), 8)
     }
 }
