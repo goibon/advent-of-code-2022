@@ -73,6 +73,22 @@ fn part_1(input: &str) -> u32 {
         .sum()
 }
 
+fn part_2(input: &str) -> u32 {
+    let map = build_dir_map(&mut input.lines());
+    let mut sizes = Vec::<u32>::new();
+    let total_space_used = get_size_of_directory("/", &map, &mut sizes);
+    let free_space = 70000000 - total_space_used;
+    let space_needed_to_update = 30000000 - free_space;
+    let mut sizes = sizes
+        .iter()
+        .filter(|&&directory_size| directory_size >= space_needed_to_update)
+        .copied()
+        .collect::<Vec<_>>();
+    sizes.sort_unstable();
+
+    *sizes.first().unwrap()
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -81,4 +97,7 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 7 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 7 Part 2: {}", part_2_result);
 }
