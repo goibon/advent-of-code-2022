@@ -13,6 +13,23 @@ fn touches(head_x: i32, head_y: i32, tail_x: i32, tail_y: i32) -> bool {
     distance <= SQRT_2
 }
 
+fn new_tail_position(head_x: i32, head_y: i32, tail_x: i32, tail_y: i32) -> (i32, i32) {
+    let mut new_tail_x = tail_x;
+    let mut new_tail_y = tail_y;
+    let clamped_x_diff = ((head_x - tail_x) as f32).clamp(-1.0, 1.0) as i32;
+    let clamped_y_diff = ((head_y - tail_y) as f32).clamp(-1.0, 1.0) as i32;
+    if head_x == tail_x {
+        new_tail_y += clamped_y_diff;
+    } else if head_y == tail_y {
+        new_tail_x += clamped_x_diff;
+    } else {
+        // Diagonal move required
+        new_tail_x += clamped_x_diff;
+        new_tail_y += clamped_y_diff;
+    }
+    (new_tail_x, new_tail_y)
+}
+
 fn part_1(input: &str) -> usize {
     let mut current_head_position = (0, 0);
     let mut current_tail_position = (0, 0);
@@ -37,38 +54,23 @@ fn part_1(input: &str) -> usize {
             let mut visited_positions = vec![(0, 0)];
             let (mut head_x, mut head_y) = current_head_position;
             let (mut tail_x, mut tail_y) = current_tail_position;
-            let mut x_step = 0;
-            let mut y_step = 0;
             match movement {
                 Move::Up(distance) => {
                     head_y += distance;
-                    y_step = 1;
                 }
                 Move::Down(distance) => {
                     head_y -= distance;
-                    y_step = -1;
                 }
                 Move::Left(distance) => {
                     head_x -= distance;
-                    x_step = -1;
                 }
                 Move::Right(distance) => {
                     head_x += distance;
-                    x_step = 1;
                 }
             };
 
             while !touches(head_x, head_y, tail_x, tail_y) {
-                tail_x += x_step;
-                tail_y += y_step;
-                // Diagonal move required
-                if head_x != tail_x && head_y != tail_y {
-                    if matches!(movement, Move::Up(_)) || matches!(movement, Move::Down(_)) {
-                        tail_x += head_x - tail_x;
-                    } else {
-                        tail_y += head_y - tail_y;
-                    }
-                }
+                (tail_x, tail_y) = new_tail_position(head_x, head_y, tail_x, tail_y);
                 visited_positions.push((tail_x, tail_y));
             }
 
