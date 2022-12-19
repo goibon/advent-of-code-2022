@@ -57,7 +57,7 @@ fn part_2(input: &str) {
         }
     });
 
-    let mut output: [char; 240] = ['.'; 240];
+    let mut output: [char; 240] = [' '; 240];
     let mut x_register = 2;
     let mut current_operation: Operation = Operation::Noop;
     let mut cycle_to_take_new_operation_at = 1;
