@@ -46,6 +46,54 @@ fn part_1(input: &str) -> i32 {
         .sum()
 }
 
+fn part_2(input: &str) {
+    let mut operations = input.lines().filter(|line| !line.is_empty()).map(|line| {
+        if line.starts_with("addx") {
+            let (_, value) = line.split_once(' ').unwrap();
+            let value = value.parse().unwrap();
+            Operation::Addx(value)
+        } else {
+            Operation::Noop
+        }
+    });
+
+    let mut output: [char; 240] = ['.'; 240];
+    let mut x_register = 2;
+    let mut current_operation: Operation = Operation::Noop;
+    let mut cycle_to_take_new_operation_at = 1;
+    let mut value_to_add_to_x: i32 = 0;
+    for cycle in 1..=240 {
+        if cycle == cycle_to_take_new_operation_at {
+            if matches!(current_operation, Operation::Addx(_)) {
+                x_register += value_to_add_to_x;
+            }
+            current_operation = operations.next().unwrap();
+            match current_operation {
+                Operation::Addx(value) => {
+                    value_to_add_to_x = value;
+                    cycle_to_take_new_operation_at += 2;
+                }
+                Operation::Noop => {
+                    cycle_to_take_new_operation_at += 1;
+                }
+            }
+        }
+
+        let sprite_position = cycle % 40;
+        if sprite_position == x_register
+            || sprite_position == x_register - 1
+            || sprite_position == x_register + 1
+        {
+            output[cycle as usize - 1] = '#';
+        }
+    }
+
+    println!("Day 10 Part 2:");
+    output.chunks(40).for_each(|x| {
+        println!("{}", x.iter().collect::<String>());
+    })
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -54,6 +102,8 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 10 Part 1: {}", part_1_result);
+
+    part_2(&input);
 }
 
 #[cfg(test)]
