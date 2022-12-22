@@ -85,7 +85,11 @@ fn create_monkey_set(input: &str) -> Vec<Monkey> {
         .collect()
 }
 
-fn evaluate_rounds(mut monkeys: Vec<Monkey>, rounds: usize) -> usize {
+fn evaluate_rounds(
+    mut monkeys: Vec<Monkey>,
+    rounds: usize,
+    worry_reducer: impl Fn(u64) -> u64,
+) -> usize {
     let mut inspection_counts: [usize; 8] = [0; 8];
     for _ in 1..=rounds {
         for monkey_index in 0..monkeys.len() {
@@ -99,7 +103,7 @@ fn evaluate_rounds(mut monkeys: Vec<Monkey>, rounds: usize) -> usize {
                         Operation::Square => item.pow(2),
                     };
 
-                    new_item / 3
+                    worry_reducer(new_item)
                 })
                 .collect::<Vec<_>>();
             monkeys[monkey_index].items.clear();
@@ -126,7 +130,7 @@ fn evaluate_rounds(mut monkeys: Vec<Monkey>, rounds: usize) -> usize {
 
 fn part_1(input: &str) -> usize {
     let monkeys = create_monkey_set(input);
-    evaluate_rounds(monkeys, 20)
+    evaluate_rounds(monkeys, 20, |item| item / 3)
 }
 
 fn main() {
