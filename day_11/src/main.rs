@@ -85,11 +85,9 @@ fn create_monkey_set(input: &str) -> Vec<Monkey> {
         .collect()
 }
 
-fn part_1(input: &str) -> usize {
-    let mut monkeys = create_monkey_set(input);
-
+fn evaluate_rounds(mut monkeys: Vec<Monkey>, rounds: usize) -> usize {
     let mut inspection_counts: [usize; 8] = [0; 8];
-    for _ in 1..=20 {
+    for _ in 1..=rounds {
         for monkey_index in 0..monkeys.len() {
             let inspected_items = monkeys[monkey_index]
                 .items
@@ -124,6 +122,11 @@ fn part_1(input: &str) -> usize {
     } else {
         0
     }
+}
+
+fn part_1(input: &str) -> usize {
+    let monkeys = create_monkey_set(input);
+    evaluate_rounds(monkeys, 20)
 }
 
 fn main() {
