@@ -133,6 +133,12 @@ fn part_1(input: &str) -> usize {
     evaluate_rounds(monkeys, 20, |item| item / 3)
 }
 
+fn part_2(input: &str) -> usize {
+    let monkeys = create_monkey_set(input);
+    let lcm: u64 = monkeys.iter().map(|monkey| monkey.test).product();
+    evaluate_rounds(monkeys, 10000, |item| item % lcm)
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -141,4 +147,7 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 11 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 11 Part 2: {}", part_2_result);
 }
