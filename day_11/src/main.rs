@@ -1,15 +1,15 @@
 #[derive(Debug)]
 enum Operation {
-    Add(u32),
-    Multiply(u32),
+    Add(u64),
+    Multiply(u64),
     Square,
 }
 
 #[derive(Debug)]
 struct Monkey {
-    items: Vec<u32>,
+    items: Vec<u64>,
     operation: Operation,
-    test: u32,           // Divisible by
+    test: u64,           // Divisible by
     true_target: usize,  // Who to throw to if test returns true
     false_target: usize, // Who to throw to if test returns false
 }
@@ -31,7 +31,7 @@ fn create_monkey_set(input: &str) -> Vec<Monkey> {
                     .trim()
                     .trim_start_matches("Starting items: ")
                     .split(", ")
-                    .filter_map(|number| number.parse::<u32>().ok())
+                    .filter_map(|number| number.parse::<u64>().ok())
                     .collect::<Vec<_>>();
                 Some((starting_items, rest))
             } else {
@@ -74,7 +74,7 @@ fn create_monkey_set(input: &str) -> Vec<Monkey> {
                 Some(Monkey {
                     items,
                     operation,
-                    test: test as u32,
+                    test: test as u64,
                     true_target,
                     false_target,
                 })
