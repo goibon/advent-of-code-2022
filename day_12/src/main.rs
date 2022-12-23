@@ -176,6 +176,52 @@ fn part_1(input: &str) -> usize {
     dijkstras(&map, start_point, end_point).unwrap()
 }
 
+fn part_2(input: &str) -> usize {
+    let map: Vec<Vec<char>> = input
+        .lines()
+        .filter(|line| !line.is_empty())
+        .map(|line| line.chars().collect())
+        .collect();
+    let end_point = map
+        .iter()
+        .enumerate()
+        .find_map(|(y_index, chars)| {
+            chars
+                .iter()
+                .enumerate()
+                .find_map(|(x_index, character)| {
+                    if *character == 'E' {
+                        Some(x_index)
+                    } else {
+                        None
+                    }
+                })
+                .map(|x_index| (y_index, x_index))
+        })
+        .unwrap();
+    let mut paths = map
+        .iter()
+        .enumerate()
+        .flat_map(|(y_index, chars)| {
+            chars
+                .iter()
+                .enumerate()
+                .filter_map(|(x_index, character)| {
+                    if *character == 'S' || *character == 'a' {
+                        Some(x_index)
+                    } else {
+                        None
+                    }
+                })
+                .map(move |x_index| (y_index, x_index))
+        })
+        .filter_map(|start_position| {
+            dijkstras(&map, start_position, end_point)
+        }).collect::<Vec<_>>();
+    paths.sort_unstable();
+    paths[0]
+}
+
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     let path = &args[1];
@@ -184,6 +230,9 @@ fn main() {
 
     let part_1_result = part_1(&input);
     println!("Day 12 Part 1: {}", part_1_result);
+
+    let part_2_result = part_2(&input);
+    println!("Day 12 Part 2: {}", part_2_result);
 }
 
 #[cfg(test)]
@@ -195,5 +244,12 @@ mod tests {
         let input = "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi\n\n";
 
         assert_eq!(part_1(input), 31);
+    }
+
+    #[test]
+    fn part_2_should_return_fewest_amount_of_steps() {
+        let input = "Sabqponm\nabcryxxl\naccszExk\nacctuvwj\nabdefghi\n\n";
+
+        assert_eq!(part_2(input), 29);
     }
 }
